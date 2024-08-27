@@ -36,16 +36,6 @@ pipeline {
             steps {
                 dir('backend') {
                     sh 'mvn clean verify -Pcoverage -Dspring.profiles.active=build'
-
-                    withSonarQubeEnv('SonarCloud') {
-                        sh '''
-                        mvn sonar:sonar \
-                            -Dsonar.projectKey=brittshook_inventory-mgmt-p1 \
-                            -Dsonar.projectName=inventory-mgmt-p1-backend \
-                            -Dsonar.java.binaries=target/classes \
-                            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
-                        '''
-                    }
                 }
                 sh 'cd backend && mvn clean install -DskipTests=true -Dspring.profiles.active=build'
             }
