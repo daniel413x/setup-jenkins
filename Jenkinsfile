@@ -36,6 +36,16 @@ pipeline {
             steps {
                 dir('backend') {
                     sh 'mvn clean verify -Pcoverage -Dspring.profiles.active=build'
+
+                    withSonarQubeEnv('SonarCloud') {
+                        sh '''
+                        mvn sonar:sonar \
+                            -Dsonar.projectKey=brittshook_inventory-mgmt-p1 \
+                            -Dsonar.projectName=inventory-mgmt-p1-backend \
+                            -Dsonar.java.binaries=target/classes \
+                            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+                        '''
+                    }
                 }
                 sh 'cd backend && mvn clean install -DskipTests=true -Dspring.profiles.active=build'
             }
@@ -127,6 +137,14 @@ pipeline {
                     // kill backend and frontend processes
                     sh "kill ${backendPid} || true"
                     sh "kill ${frontendPid} || true"
+                }
+            }
+        }
+
+        stage('Deploy Frontend') {
+            steps {
+                withAWS(region: 'us-east-1', credentials: 'AWS_CREDENTIALS') {
+                    sh 'aws s3 sync frontend/dist s3://crag-supply-co-client'
                 }
             }
         }

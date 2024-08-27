@@ -6,7 +6,7 @@ import { getWarehouses, WarehouseDataType } from "../api/warehouse";
 import { ErrorPage } from "./ErrorPage";
 
 export const Dashboard = () => {
-  console.log("jenkins-setup");
+  console.log("eee");
   const [totalInventory, setTotalInventory] = useState<number>(0);
   const [totalCapacity, setTotalCapacity] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
