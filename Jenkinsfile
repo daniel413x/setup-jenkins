@@ -21,28 +21,13 @@ pipeline {
         stage('Build and Analyze Frontend') {
             steps {
                 script {
-                    withSonarQubeEnv('SonarCloud') {
-                        dir('frontend') {
-                            sh '''
-                            npm install
-                            npm run build
-                            npm run test -- --coverage
-                            npx sonar-scanner \
-                                -Dsonar.projectKey=mgmt-p1 \
-                                -Dsonar.projectName=inventory-mgmt-p1-frontend \
-                                -Dsonar.sources=src \
-                                -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
-                            '''
-                        }
+                    dir('frontend') {
+                        sh '''
+                        npm install
+                        npm run build
+                        npm run test
+                        '''
                     }
-                }
-            }
-        }
-
-        stage('Deploy Frontend') {
-            steps {
-                withAWS(region: 'us-east-1', credentials: 'AWS_CREDENTIALS') {
-                    sh 'aws s3 sync frontend/dist s3://crag-supply-co-client'
                 }
             }
         }
@@ -74,7 +59,7 @@ pipeline {
 
         stage('Perform Functional Tests') {
             steps {
-                // Clean up project-two-functional-tests repo if leftover from previous build/failure
+                // clean up project-two-functional-tests repo if leftover from previous build/failure
                 sh '''
                     if [ -d "project-two-functional-tests" ]; then
                         echo "Directory exists, deleting..."
@@ -146,10 +131,10 @@ pipeline {
                         '''
                     }
 
-                    // Clean up project-two-functional-tests repo
+                    // clean up project-two-functional-tests repo
                     sh 'rm -rf project-two-functional-tests'
 
-                    // Kill backend and frontend processes
+                    // kill backend and frontend processes
                     sh "kill ${backendPid} || true"
                     sh "kill ${frontendPid} || true"
                 }
